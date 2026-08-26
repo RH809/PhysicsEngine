@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="PhysicsEngine/PhysicsEngine.vcxproj" Id="e569864e-a4f9-41fd-970f-22ffe625b718" />
+</Solution>
