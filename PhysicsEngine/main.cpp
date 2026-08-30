@@ -1,5 +1,8 @@
 #include <GLFW/glfw3.h>
 #include <glad/glad.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 
 const char* vertexShaderSource =
@@ -7,9 +10,11 @@ const char* vertexShaderSource =
 "layout (location = 0) in vec3 aPos;\n"
 "layout (location = 1) in vec3 aColor;\n"
 "out vec3 color;\n"
+"uniform mat4 transform;\n"
 "void main()\n"
 "{\n"
-"    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+//"    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);\n"
+"    gl_Position = transform * vec4(aPos, 1.0f);\n"
 "    color = aColor;\n"
 "}\0";
 
@@ -50,6 +55,7 @@ int main() {
 
     glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // set callback
+
 
     float vertices[] = {
         // positions        // colors
@@ -138,6 +144,8 @@ int main() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
+    
+
     while (!glfwWindowShouldClose(window)) {
         // input
         processInput(window);
@@ -145,6 +153,13 @@ int main() {
         // rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+
+        glm::mat4 trans = glm::mat4(1.0f);
+        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+        unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
