@@ -27,8 +27,8 @@ const char* fragmentShaderSource =
 "    FragColor = vec4(color, 1.0);\n"
 "}\0";
 
-void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-void processInput(GLFWwindow* window);
+void framebuffer_size_callback(GLFWwindow*, int, int);
+void processInput(GLFWwindow*, float&, float&, float&, double&, float&, float);
 
 int main() {
     // initialize glfw
@@ -144,21 +144,28 @@ int main() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    
+    unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+
+    double scale = 1.0;
+    float x = 0.0f, y = 0.0f, z = 0.0f;
+    float rotation = 0.0f;
+    float prevTime = glfwGetTime();
 
     while (!glfwWindowShouldClose(window)) {
+        float time = glfwGetTime();
+        float deltaTime = time - prevTime;
         // input
-        processInput(window);
+        processInput(window, x, y, z, scale, rotation, deltaTime);
 
         // rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
         glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
-        trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
-
-        unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+        trans = glm::translate(trans, glm::vec3(x, y, z));
+        trans = glm::rotate(trans, rotation, glm::vec3(0.0f, 0.0f, 1.0f));
+        trans = glm::scale(trans, glm::vec3(scale, scale, scale));
+        
         glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
 
         glBindVertexArray(VAO);
@@ -168,6 +175,7 @@ int main() {
         // check and call events + swap buffers
         glfwPollEvents();
         glfwSwapBuffers(window);
+        prevTime = time;
     }
     glfwTerminate();
     return 0;
@@ -183,8 +191,35 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
 /**
 * Handles all input processing
 */
-void processInput(GLFWwindow* window) {
+void processInput(GLFWwindow* window, float& x, float& y, float& z, double& scale, float& rotation, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
+    }
+    // translation
+    if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS) {
+        x -= deltaTime;
+    }
+    if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
+        x += deltaTime;
+    }
+    if (glfwGetKey(window,GLFW_KEY_UP) == GLFW_PRESS) {
+        y += deltaTime;
+    }
+    if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS) {
+        y -= deltaTime;
+    }
+    // rotation
+    if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) {
+        rotation += deltaTime;
+    }
+    if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) {
+        rotation -= deltaTime;
+    }
+    // scaling
+    if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        scale += deltaTime;
+    }
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        scale -= deltaTime;
     }
 }
