@@ -4,17 +4,20 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <vector>
 
 const char* vertexShaderSource =
 "#version 460 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "layout (location = 1) in vec3 aColor;\n"
 "out vec3 color;\n"
-"uniform mat4 transform;\n"
+"uniform mat4 model;\n"
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
 "void main()\n"
 "{\n"
 //"    gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0f);\n"
-"    gl_Position = transform * vec4(aPos, 1.0f);\n"
+"    gl_Position = projection * view * model * vec4(aPos, 1.0f);\n"
 "    color = aColor;\n"
 "}\0";
 
@@ -28,7 +31,8 @@ const char* fragmentShaderSource =
 "}\0";
 
 void framebuffer_size_callback(GLFWwindow*, int, int);
-void processInput(GLFWwindow*, float&, float&, float&, double&, float&, float);
+void processInput(GLFWwindow*);
+//void processInput(GLFWwindow*, float&, float&, float&, double&, float&, float);
 
 int main() {
     // initialize glfw
@@ -36,7 +40,6 @@ int main() {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 6); // OpenGL 4.6
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 
     // create glfw window
     GLFWwindow* window = glfwCreateWindow(800, 600, "Test", NULL, NULL);
@@ -55,8 +58,50 @@ int main() {
 
     glViewport(0, 0, 800, 600);
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback); // set callback
+    glEnable(GL_DEPTH_TEST);
 
+    float radius = 0.5f;
+    int slices = 20;
+    int stacks = 20;
 
+    std::vector<float> vertices = std::vector<float>();
+    std::vector<unsigned int> indices = std::vector<unsigned int>();
+    for (int i = 0; i <= stacks; i++) {
+        float phi = glm::pi<float>() * ((float) i / stacks);
+        for (int j = 0; j <= slices; j++) {
+            float theta = 2 * glm::pi<float>() * ((float) j / slices);
+            float x = radius * sin(phi) * cos(theta);
+            float y = radius * cos(phi);
+            float z = radius * sin(phi) * sin(theta);
+
+            float r = 1.0f - (i / (float) stacks);
+            float g = (float) i / stacks;
+            float b = (float) j / slices;
+
+            vertices.push_back(x);
+            vertices.push_back(y);
+            vertices.push_back(z);
+
+            vertices.push_back(r);
+            vertices.push_back(g);
+            vertices.push_back(b);
+
+            if (i != stacks && j != slices) {
+                int current = i * (slices + 1) + j;
+                int next = (i + 1) * (slices + 1) + j;
+
+                indices.push_back(current);
+                indices.push_back(next);
+                indices.push_back(current + 1);
+
+                indices.push_back(current + 1);
+                indices.push_back(next);
+                indices.push_back(next + 1);
+            }
+        }
+    }
+
+    /*
     float vertices[] = {
         // positions        // colors
         0.5f, 0.5f, 0.0f,   1.0f, 0.0f, 0.0f, // top right
@@ -70,12 +115,13 @@ int main() {
         0, 1, 3,
         1, 2, 3
     };
+    */
 
     // create VBO
     unsigned int VBO;
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
 
     // compile vertex shader
     unsigned int vertexShader;
@@ -136,7 +182,7 @@ int main() {
     unsigned int EBO;
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
 
     // set vertex data interpretation
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
@@ -144,7 +190,9 @@ int main() {
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    unsigned int transformLoc = glGetUniformLocation(shaderProgram, "transform");
+    unsigned int modelLoc = glGetUniformLocation(shaderProgram, "model");
+    unsigned int viewLoc = glGetUniformLocation(shaderProgram, "view");
+    unsigned int projectionLoc = glGetUniformLocation(shaderProgram, "projection");
 
     double scale = 1.0;
     float x = 0.0f, y = 0.0f, z = 0.0f;
@@ -155,21 +203,33 @@ int main() {
         float time = glfwGetTime();
         float deltaTime = time - prevTime;
         // input
-        processInput(window, x, y, z, scale, rotation, deltaTime);
+        processInput(window);
 
         // rendering
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::translate(trans, glm::vec3(x, y, z));
-        trans = glm::rotate(trans, rotation, glm::vec3(0.0f, 0.0f, 1.0f));
-        trans = glm::scale(trans, glm::vec3(scale, scale, scale));
-        
-        glUniformMatrix4fv(transformLoc, 1, GL_FALSE, glm::value_ptr(trans));
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::rotate(model, (float)glfwGetTime() * glm::radians(50.0f), glm::vec3(0.5f, 1.0f, 0.0f));
+
+        glm::mat4 view = glm::mat4(1.0f);
+        view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
+
+        glm::mat4 projection;
+        projection = glm::perspective(glm::radians(45.0f), 800.0f / 600.0f, 0.1f, 100.0f);
+
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
+        glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
+        glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
         glBindVertexArray(VAO);
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+        //glDrawElements(GL_TRIANGLES, 2 * slices * stacks, GL_UNSIGNED_INT, 0);
+        glDrawElements(
+            GL_TRIANGLES,
+            static_cast<GLsizei>(indices.size()),
+            GL_UNSIGNED_INT,
+            nullptr
+        );
         glBindVertexArray(0);
 
         // check and call events + swap buffers
@@ -188,9 +248,16 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
+void processInput(GLFWwindow* window) {
+    if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, true);
+    }
+}
+
 /**
 * Handles all input processing
 */
+/*
 void processInput(GLFWwindow* window, float& x, float& y, float& z, double& scale, float& rotation, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, true);
@@ -223,3 +290,4 @@ void processInput(GLFWwindow* window, float& x, float& y, float& z, double& scal
         scale -= deltaTime;
     }
 }
+*/
