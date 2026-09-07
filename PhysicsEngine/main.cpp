@@ -37,15 +37,17 @@ const char* fragmentShaderSource =
 #define WINDOW_HEIGHT (900)
 
 void framebuffer_size_callback(GLFWwindow*, int, int);
-void processInput(GLFWwindow*);
+void processInput(GLFWwindow*, float);
 void mouse_callback(GLFWwindow* window, double, double);
 //void processInput(GLFWwindow*, float&, float&, float&, double&, float&, float);
 
 bool inFocus = true;
 bool firstMouse = true;
+glm::vec3 cameraPos;
+float movementMultiplier = 3.0f;
 float lastMouseX = WINDOW_WIDTH / 2.0f;
 float lastMouseY = WINDOW_HEIGHT / 2.0f;
-float mouseSensitivity = 1.0f;
+float mouseSensitivity = 0.75f;
 float cameraYaw = 0.0f; 
 float cameraPitch = 0.0f;
 
@@ -230,9 +232,18 @@ int main() {
     objects.push_back(std::make_unique<Sphere>(-9.5f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
+    glBindVertexArray(VAO);
+    for (const auto& object : objects) {
+        const std::vector<float>& vertices = object->getVertices();
+        const std::vector<unsigned int>& indices = object->getIndices();
+        glBindBuffer(GL_ARRAY_BUFFER, VBO);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
+    }
 	
     float prevTime = glfwGetTime();
-	glm::vec3 cameraPos = glm::vec3(5.0f, 20.0f, 20.0f);
+	cameraPos = glm::vec3(5.0f, 20.0f, 20.0f);
     glm::vec3 direction = glm::normalize(glm::vec3(0.0f) - cameraPos);
     cameraYaw = glm::degrees(atan2(direction.z, direction.x));
     cameraPitch = glm::degrees(asin(direction.y));
@@ -241,7 +252,7 @@ int main() {
         float time = glfwGetTime();
         float deltaTime = time - prevTime;
         // input
-        processInput(window);
+        processInput(window, deltaTime);
         
 		direction.x = cos(glm::radians(cameraYaw)) * cos(glm::radians(cameraPitch));
 		direction.y = sin(glm::radians(cameraPitch));
@@ -261,13 +272,8 @@ int main() {
         );
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
+        glBindVertexArray(VAO);
         for (const auto& object : objects) {
-            const std::vector<float>& vertices = object->getVertices();
-            const std::vector<unsigned int>& indices = object->getIndices();
-
-            glBufferData(GL_ARRAY_BUFFER, sizeof(float) * vertices.size(), vertices.data(), GL_STATIC_DRAW);
-            glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned int) * indices.size(), indices.data(), GL_STATIC_DRAW);
-
             glm::mat4 model = glm::translate(glm::mat4(1.0f), object->getPos()) * glm::mat4_cast(object->getRotation());
 
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
@@ -276,11 +282,10 @@ int main() {
             //glDrawElements(GL_TRIANGLES, 2 * slices * stacks, GL_UNSIGNED_INT, 0);
             glDrawElements(
                 GL_TRIANGLES,
-                static_cast<GLsizei>(indices.size()),
+                static_cast<GLsizei>(object->getIndices().size()),
                 GL_UNSIGNED_INT,
                 nullptr
             );
-            glBindVertexArray(0);
         }
 
         // check and call events + swap buffers
@@ -299,7 +304,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height) {
     glViewport(0, 0, width, height);
 }
 
-void processInput(GLFWwindow* window) {
+void processInput(GLFWwindow* window, float deltaTime) {
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
         inFocus = false;
@@ -307,6 +312,24 @@ void processInput(GLFWwindow* window) {
     else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
         inFocus = true;
+    }
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+		cameraPos += movementMultiplier * deltaTime * glm::normalize(glm::vec3(cos(glm::radians(cameraYaw)), 0.0f, sin(glm::radians(cameraYaw))));
+	}
+    if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        cameraPos -= movementMultiplier * deltaTime * glm::normalize(glm::vec3(cos(glm::radians(cameraYaw)), 0.0f, sin(glm::radians(cameraYaw))));
+    }
+    if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+        cameraPos += movementMultiplier * deltaTime * glm::normalize(glm::vec3(cos(glm::radians(cameraYaw + 90.0f)), 0.0f, sin(glm::radians(cameraYaw + 90.0f))));
+    }
+    if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+        cameraPos -= movementMultiplier * deltaTime * glm::normalize(glm::vec3(cos(glm::radians(cameraYaw + 90.0f)), 0.0f, sin(glm::radians(cameraYaw + 90.0f))));
+    }
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+		cameraPos += movementMultiplier * deltaTime * glm::vec3(0.0f, 1.0f, 0.0f);
+	}
+    if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+        cameraPos -= movementMultiplier * deltaTime * glm::vec3(0.0f, 1.0f, 0.0f);
     }
 }
 
