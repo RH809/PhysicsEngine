@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "object_node.h"
+#include "object_manager.h"
 
 
 class Object {
@@ -25,15 +26,19 @@ protected:
 	std::vector<unsigned int> indices;
 
 	ObjectNode* node;
+	ObjectManager* manager;
+	int bucketID;
 
 public:
-	Object(float _x, float _y, float _z, glm::quat _r, float _m, float _s);
+	Object(float _x, float _y, float _z, glm::quat _r, float _m, float _s, ObjectManager* _manager);
 
 	glm::vec3 getPos() const;
 	glm::quat getRotation() const;
 	const std::vector<float>& getVertices() const;
 	const std::vector<unsigned int>& getIndices() const;
+	ObjectNode* getNode() const;
 
+	void updateBucket();
 };
 
 #endif

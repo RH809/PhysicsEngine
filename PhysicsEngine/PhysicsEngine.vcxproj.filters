@@ -30,6 +30,12 @@
     <ClCompile Include="object_node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="object_bucket.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="object_manager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="object.h">
@@ -42,6 +48,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="object_bucket.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="object_manager.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,7 +1,7 @@
 #ifndef OBJECT_NODE_H
 #define OBJECT_NODE_H
 
-#include <iostream>
+#include <memory>
 
 #include "object.h"
 

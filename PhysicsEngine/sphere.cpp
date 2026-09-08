@@ -1,7 +1,7 @@
 #include "sphere.h"
 #include <vector>
 
-Sphere::Sphere(float _x, float _y, float _z, glm::quat _r, float _m, float _s) : Object(_x, _y, _z, _r, _m, _s) {
+Sphere::Sphere(float _x, float _y, float _z, glm::quat _r, float _m, float _s, ObjectManager *_manager) : Object(_x, _y, _z, _r, _m, _s, _manager) {
     radius = DEFAULT_RADIUS * _s;
     for (int i = 0; i <= NUM_STACKS; i++) {
         float phi = glm::pi<float>() * ((float)i / NUM_STACKS);
@@ -37,4 +37,8 @@ Sphere::Sphere(float _x, float _y, float _z, glm::quat _r, float _m, float _s) :
             }
         }
     }
+
+	node = new ObjectNode(nullptr, nullptr, std::shared_ptr<Sphere>(this));
+	bucketID = manager->getBucketID(position);
+    manager->addObject(bucketID, node);
 }

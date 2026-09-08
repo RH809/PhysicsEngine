@@ -10,8 +10,7 @@ private:
 public:
 	ObjectBucket();
 	void addObject(ObjectNode* object);
-	void removeHead();
-	void removeTail();
+	void removeObject(ObjectNode* object);
 };
 
 #endif

@@ -4,10 +4,12 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
+#include <memory>
 #include <vector>
 
 #include "object.h"
 #include "sphere.h"
+#include "object_manager.h"
 
 const char* vertexShaderSource =
 "#version 460 core\n"
@@ -220,6 +222,7 @@ int main() {
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(45.0f), (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT, 0.1f, 100.0f);
 
+    /*
     std::vector<std::shared_ptr<Object>> objects  = std::vector<std::shared_ptr<Object>>();
     objects.push_back(std::make_shared<Sphere>(0.0f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
     objects.push_back(std::make_shared<Sphere>(1.0f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
@@ -230,10 +233,14 @@ int main() {
     objects.push_back(std::make_shared<Sphere>(0.0f, 0.0f, -5.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
     objects.push_back(std::make_shared<Sphere>(9.5f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
     objects.push_back(std::make_shared<Sphere>(-9.5f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
+    */
+    ObjectManager *manager = new ObjectManager();
+
+
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
     glBindVertexArray(VAO);
-    for (const auto& object : objects) {
+    for (const auto& object : manager->getObjects()) {
         const std::vector<float>& vertices = object->getVertices();
         const std::vector<unsigned int>& indices = object->getIndices();
         glBindBuffer(GL_ARRAY_BUFFER, VBO);
@@ -266,14 +273,14 @@ int main() {
         glm::mat4 view = glm::mat4(1.0f);
         //view = glm::translate(view, glm::vec3(0.0f, 0.0f, -3.0f));
         view = glm::lookAt(
-            cameraPos, // camera position
-            cameraPos + direction,  // looking at origin
-            glm::vec3(0.0f, 1.0f, 0.0f)   // up
+            cameraPos, 
+            cameraPos + direction,
+            glm::vec3(0.0f, 1.0f, 0.0f)
         );
         glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 
         glBindVertexArray(VAO);
-        for (const auto& object : objects) {
+        for (const auto& object : manager->getObjects()) {
             glm::mat4 model = glm::translate(glm::mat4(1.0f), object->getPos()) * glm::mat4_cast(object->getRotation());
 
             glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));

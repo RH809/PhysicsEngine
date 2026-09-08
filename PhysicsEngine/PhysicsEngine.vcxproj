@@ -145,12 +145,15 @@
     <ClCompile Include="glad.c" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="object.cpp" />
+    <ClCompile Include="object_bucket.cpp" />
+    <ClCompile Include="object_manager.cpp" />
     <ClCompile Include="object_node.cpp" />
     <ClCompile Include="sphere.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="object.h" />
     <ClInclude Include="object_bucket.h" />
+    <ClInclude Include="object_manager.h" />
     <ClInclude Include="object_node.h" />
     <ClInclude Include="sphere.h" />
   </ItemGroup>
