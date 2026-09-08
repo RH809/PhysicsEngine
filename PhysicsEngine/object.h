@@ -8,6 +8,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 
+#include "object_node.h"
+
 
 class Object {
 
@@ -21,6 +23,8 @@ protected:
 
 	std::vector<float> vertices;
 	std::vector<unsigned int> indices;
+
+	ObjectNode* node;
 
 public:
 	Object(float _x, float _y, float _z, glm::quat _r, float _m, float _s);

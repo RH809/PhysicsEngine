@@ -1,4 +1,5 @@
 #include "object.h"
+#include "object_node.h"
 
 Object::Object(float _x, float _y, float _z, glm::quat _r, float _m, float _s) : rotation(_r), mass(_m), scale(_s){
 	position.x = _x;
@@ -7,6 +8,8 @@ Object::Object(float _x, float _y, float _z, glm::quat _r, float _m, float _s) :
 
 	vertices = std::vector<float>();
 	indices = std::vector<unsigned int>();
+
+	node = new ObjectNode(nullptr, nullptr, this);
 }
 
 glm::vec3 Object::getPos() const {

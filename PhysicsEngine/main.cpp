@@ -220,16 +220,16 @@ int main() {
     glm::mat4 projection;
     projection = glm::perspective(glm::radians(45.0f), (float) WINDOW_WIDTH / (float) WINDOW_HEIGHT, 0.1f, 100.0f);
 
-    std::vector<std::unique_ptr<Object>> objects  = std::vector<std::unique_ptr<Object>>();
-    objects.push_back(std::make_unique<Sphere>(0.0f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
-    objects.push_back(std::make_unique<Sphere>(1.0f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
-    objects.push_back(std::make_unique<Sphere>(-1.0f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
-    objects.push_back(std::make_unique<Sphere>(0.0f, 1.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
-    objects.push_back(std::make_unique<Sphere>(0.0f, -1.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
-    objects.push_back(std::make_unique<Sphere>(0.0f, 0.0f, 5.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
-    objects.push_back(std::make_unique<Sphere>(0.0f, 0.0f, -5.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
-    objects.push_back(std::make_unique<Sphere>(9.5f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
-    objects.push_back(std::make_unique<Sphere>(-9.5f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
+    std::vector<std::shared_ptr<Object>> objects  = std::vector<std::shared_ptr<Object>>();
+    objects.push_back(std::make_shared<Sphere>(0.0f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
+    objects.push_back(std::make_shared<Sphere>(1.0f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
+    objects.push_back(std::make_shared<Sphere>(-1.0f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
+    objects.push_back(std::make_shared<Sphere>(0.0f, 1.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
+    objects.push_back(std::make_shared<Sphere>(0.0f, -1.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
+    objects.push_back(std::make_shared<Sphere>(0.0f, 0.0f, 5.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
+    objects.push_back(std::make_shared<Sphere>(0.0f, 0.0f, -5.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
+    objects.push_back(std::make_shared<Sphere>(9.5f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
+    objects.push_back(std::make_shared<Sphere>(-9.5f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f));
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 
     glBindVertexArray(VAO);
