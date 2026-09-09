@@ -1,5 +1,9 @@
-#include "sphere.h"
+#include <memory>
 #include <vector>
+
+#include "sphere.h"
+#include "object_node.h"
+#include "object_manager.h"
 
 Sphere::Sphere(float _x, float _y, float _z, glm::quat _r, float _m, float _s, ObjectManager *_manager) : Object(_x, _y, _z, _r, _m, _s, _manager) {
     radius = DEFAULT_RADIUS * _s;

@@ -8,9 +8,8 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <vector>
 
-#include "object_node.h"
-#include "object_manager.h"
-
+class ObjectManager;
+class ObjectNode;
 
 class Object {
 

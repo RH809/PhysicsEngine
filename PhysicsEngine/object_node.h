@@ -5,6 +5,8 @@
 
 #include "object.h"
 
+class ObjectManager;
+
 class ObjectNode {
 public:
 	ObjectNode* prev;

@@ -1,5 +1,6 @@
 #include "object.h"
 #include "object_node.h"
+#include "object_manager.h"
 
 Object::Object(float _x, float _y, float _z, glm::quat _r, float _m, float _s, ObjectManager* _manager) : rotation(_r), mass(_m), scale(_s), manager(_manager) {
 	position.x = _x;
