@@ -28,6 +28,10 @@ protected:
 	ObjectManager* manager;
 	int bucketID;
 
+	unsigned int VAO;
+	unsigned int VBO;
+	unsigned int EBO;
+
 public:
 	Object(float _x, float _y, float _z, glm::quat _r, float _m, float _s, ObjectManager* _manager);
 
@@ -36,8 +40,12 @@ public:
 	const std::vector<float>& getVertices() const;
 	const std::vector<unsigned int>& getIndices() const;
 	ObjectNode* getNode() const;
+	void setNode(ObjectNode*);
 
 	void updateBucket();
+
+	void setupBuffers();
+	unsigned int getVAO() const;
 };
 
 #endif

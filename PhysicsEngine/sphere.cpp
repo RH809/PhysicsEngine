@@ -41,8 +41,6 @@ Sphere::Sphere(float _x, float _y, float _z, glm::quat _r, float _m, float _s, O
             }
         }
     }
-
-	node = new ObjectNode(nullptr, nullptr, std::shared_ptr<Sphere>(this));
-	bucketID = manager->getBucketID(position);
-    manager->addObject(bucketID, node);
+    bucketID = manager->getBucketID(position);
+    setupBuffers();
 }

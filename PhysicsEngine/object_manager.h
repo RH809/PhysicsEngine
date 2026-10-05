@@ -19,6 +19,8 @@ public:
 		return ((int)(pos.x) + BOX_SIZE) + ((int)(pos.y) + BOX_SIZE) * 100 + ((int)(pos.z) + BOX_SIZE) * 10000;
 	}
 
+	void createSphere(float x, float y, float z, glm::quat r, float m, float s);
+
 	void addObject(int id, ObjectNode* node);
 	void moveObject(int oldID, int newID, ObjectNode* node);
 

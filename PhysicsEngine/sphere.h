@@ -13,4 +13,7 @@ private:
 public:
 	Sphere(float _x, float _y, float _z, glm::quat _r, float _m, float _s, ObjectManager *_manager);
 };
+
+
+
 #endif
