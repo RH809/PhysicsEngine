@@ -9,6 +9,7 @@ private:
 	ObjectNode* tail;
 public:
 	ObjectBucket();
+	~ObjectBucket();
 	void addObject(ObjectNode* object);
 	void removeObject(ObjectNode* object);
 };

@@ -11,7 +11,15 @@ Object::Object(float _x, float _y, float _z, glm::quat _r, float _m, float _s, O
 	indices = std::vector<unsigned int>();
 	bucketID = 0;
 	node = NULL;
-	manager = NULL;
+	VAO = 0;
+	VBO = 0;
+	EBO = 0;
+}
+
+Object::~Object() {
+	glDeleteVertexArrays(1, &VAO);
+	glDeleteBuffers(1, &VBO);
+	glDeleteBuffers(1, &EBO);
 }
 
 glm::vec3 Object::getPos() const {

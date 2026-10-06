@@ -15,6 +15,7 @@ private:
 	std::vector<std::shared_ptr<Object>> objects;
 public:
 	ObjectManager();
+	~ObjectManager();
 	static int getBucketID(glm::vec3 pos) {
 		return ((int)(pos.x) + BOX_SIZE) + ((int)(pos.y) + BOX_SIZE) * 100 + ((int)(pos.z) + BOX_SIZE) * 10000;
 	}

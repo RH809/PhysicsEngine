@@ -34,6 +34,7 @@ protected:
 
 public:
 	Object(float _x, float _y, float _z, glm::quat _r, float _m, float _s, ObjectManager* _manager);
+	~Object();
 
 	glm::vec3 getPos() const;
 	glm::quat getRotation() const;

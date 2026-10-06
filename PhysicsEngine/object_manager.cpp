@@ -26,6 +26,12 @@ ObjectManager::ObjectManager() {
 	createSphere(-9.5f, 0.0f, 0.0f, glm::quat(1.0f, 0.0f, 0.0f, 0.0f), 1.0f, 1.0f);
 }
 
+ObjectManager::~ObjectManager() {
+	for (auto& pair : bucketMap) {
+		delete pair.second;
+	}
+}
+
 void ObjectManager::createSphere(float x, float y, float z, glm::quat r, float m, float s) {
 	auto newSphere = std::make_shared<Sphere>(x, y, z, r, m, s, this);
 	ObjectNode* node = new ObjectNode(nullptr, nullptr, newSphere);
