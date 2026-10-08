@@ -166,13 +166,13 @@ int main() {
 
     float boxVertices[] = {
         // position              // color
-        -10.0f,  0.0f, -10.0f,   1.0f, 1.0f, 1.0f, // 0
-         10.0f,  0.0f, -10.0f,   1.0f, 1.0f, 1.0f, // 1
+        -10.0f,  -10.0f, -10.0f,   1.0f, 1.0f, 1.0f, // 0
+         10.0f,  -10.0f, -10.0f,   1.0f, 1.0f, 1.0f, // 1
          10.0f, 10.0f, -10.0f,   1.0f, 1.0f, 1.0f, // 2
         -10.0f, 10.0f, -10.0f,   1.0f, 1.0f, 1.0f, // 3
 
-        -10.0f,  0.0f,  10.0f,   1.0f, 1.0f, 1.0f, // 4
-         10.0f,  0.0f,  10.0f,   1.0f, 1.0f, 1.0f, // 5
+        -10.0f,  -10.0f,  10.0f,   1.0f, 1.0f, 1.0f, // 4
+         10.0f,  -10.0f,  10.0f,   1.0f, 1.0f, 1.0f, // 5
          10.0f, 10.0f,  10.0f,   1.0f, 1.0f, 1.0f, // 6
         -10.0f, 10.0f,  10.0f,   1.0f, 1.0f, 1.0f  // 7
     };
@@ -197,12 +197,34 @@ int main() {
         5, 6
     };
 
+    unsigned int boxVAO;
+    unsigned int boxVBO;
+    unsigned int boxEBO;
+
+	glGenVertexArrays(1, &boxVAO);
+    glBindVertexArray(boxVAO);
+
+	glGenBuffers(1, &boxVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, boxVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(boxVertices), boxVertices, GL_STATIC_DRAW);
+
+    glGenBuffers(1, &boxEBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, boxEBO);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(boxIndices), boxIndices, GL_STATIC_DRAW);
+
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+    glEnableVertexAttribArray(1);
+
+    glBindVertexArray(0);
+
     ObjectManager *manager = new ObjectManager();
 
     glUniformMatrix4fv(projectionLoc, 1, GL_FALSE, glm::value_ptr(projection));
 	
     float prevTime = glfwGetTime();
-	cameraPos = glm::vec3(5.0f, 20.0f, 20.0f);
+	cameraPos = glm::vec3(0.0, 20.0f, 20.0f);
     glm::vec3 direction = glm::normalize(glm::vec3(0.0f) - cameraPos);
     cameraYaw = glm::degrees(atan2(direction.z, direction.x));
     cameraPitch = glm::degrees(asin(direction.y));
@@ -244,6 +266,16 @@ int main() {
                 nullptr
             );
         }
+        // Draw bounding box
+        glm::mat4 boxModel = glm::mat4(1.0f);
+        glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(boxModel));
+        glBindVertexArray(boxVAO);
+		glDrawElements(
+			GL_LINES,
+			sizeof(boxIndices) / sizeof(unsigned int),
+			GL_UNSIGNED_INT,
+			nullptr
+		);
         glBindVertexArray(0);
 
 
