@@ -5,6 +5,15 @@ ObjectBucket::ObjectBucket() {
 	tail = nullptr;
 }
 
+ObjectBucket::~ObjectBucket() {
+	ObjectNode* curr = head;
+	while (curr != nullptr) {
+		ObjectNode* next = head->next;
+		delete curr;
+		curr = next;
+	}
+}
+
 void ObjectBucket::addObject(ObjectNode *object) {
 	if (head == nullptr) {
 		head = object;
@@ -26,7 +35,9 @@ void ObjectBucket::removeObject(ObjectNode* object) {
 		if (head == nullptr) {
 			tail = nullptr;
 		}
-		head->prev = nullptr;
+		else {
+			head->prev = nullptr;
+		}
 	}
 	else if (object == tail) {
 		tail = object->prev;
